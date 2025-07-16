@@ -1,0 +1,24 @@
+# 1) Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+
+# 2) Test binaries & coverage
+*.test
+*.out
+*.coverprofile
+
+# 4) Generated code
+*_gen.go
+
+# 5) IDE / editor files
+*.swp
+*.tmp
+.idea/
+.vscode/
+
+# 6) OS junk
+.DS_Store
+Thumbs.db
+
