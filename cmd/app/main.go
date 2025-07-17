@@ -1,37 +1,23 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"log"
+    "log"
+    "net/http"
 
-	"github.com/joho/godotenv"
-	"github.com/tmc/langchaingo/llms"
-	"github.com/sultantemuruly/blog_writer_service/internal/ai"
+    "github.com/joho/godotenv"
+
+	"github.com/sultantemuruly/blog_writer_service/internal/routes"
 )
 
 func main() {
-	
-	if err := godotenv.Load(); err != nil {
-        log.Println("No .env file found, relying on real ENV vars")
+    if err := godotenv.Load(); err != nil {
+        log.Println("No .env file found, continuing")
     }
 
-	ctx := context.Background()
+	mux := http.NewServeMux()
+	routes.RegisterRoutes(mux)
 
-	llm, err := ai.NewLLM()
-	if err != nil {
-		log.Fatal(err)
-		fmt.Println("Error creating LLM:", err)
-		return
-	}
-
-	completion, err := llms.GenerateFromSinglePrompt(ctx,
-		llm,
-		"Tell me a joke please!",
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(completion)
+	addr := ":8080"
+    log.Printf("Server listening on http://localhost%s\n", addr)
+	log.Fatal(http.ListenAndServe(addr, mux))
 }
