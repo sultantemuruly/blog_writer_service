@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"context"
 	"net/http"
 	"encoding/json"
 	"log"
@@ -26,7 +25,7 @@ func llmHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    ctx := context.Background()
+    ctx := r.Context()
     llm, err := ai.NewLLM()
     if err != nil {
         log.Println("Error creating LLM:", err)

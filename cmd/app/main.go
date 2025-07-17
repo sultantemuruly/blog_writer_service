@@ -1,12 +1,16 @@
 package main
 
 import (
+    "os"
     "log"
     "net/http"
     "time"
+    "context"
 
     "github.com/joho/godotenv"
+    // "github.com/jackc/pgx/v5"
 
+    "github.com/sultantemuruly/blog_writer_service/internal/db"
 	"github.com/sultantemuruly/blog_writer_service/internal/routes"
 )
 
@@ -14,6 +18,19 @@ func main() {
     if err := godotenv.Load(); err != nil {
         log.Println("No .env file found, continuing")
     }
+
+    ctx := context.Background()
+
+    dsn := os.Getenv("NEON_DATABASE_URL")
+    if dsn == "" {
+        log.Fatal("NEON_DATABASE_URL environment variable is not set")
+    }
+
+    conn, err := db.Connect(ctx, dsn)
+    if err != nil {
+        log.Fatalf("Failed to connect to the database: %v", err)
+    }
+    defer conn.Close(ctx)
 
 	mux := http.NewServeMux()
 	routes.RegisterRoutes(mux)
