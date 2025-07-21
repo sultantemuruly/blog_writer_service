@@ -21,19 +21,22 @@ func main() {
 
     ctx := context.Background()
 
-    dsn := os.Getenv("NEON_DATABASE_URL")
+    dsn := os.Getenv("DATABASE_URL")
     if dsn == "" {
         log.Fatal("NEON_DATABASE_URL environment variable is not set")
+        log.Println("Please set the NEON_DATABASE_URL environment variable to your database connection string.")
+        return
     }
 
     conn, err := db.Connect(ctx, dsn)
     if err != nil {
         log.Fatalf("Failed to connect to the database: %v", err)
+        log.Println("Ensure your database is running and the connection string is correct.")
     }
     defer conn.Close(ctx)
 
 	mux := http.NewServeMux()
-	routes.RegisterRoutes(mux)
+	routes.RegisterRoutes(mux, conn)
 
     client := &http.Client{Timeout: 40 * time.Second}
     go func () {
@@ -42,6 +45,8 @@ func main() {
 
         if err := WriteBlog(client); err != nil {
             log.Println("Error writing blog:", err)
+            log.Println("Retrying in 60 seconds...")
+            ticker.Reset(60 * time.Second)
         }
 
         for range ticker.C {

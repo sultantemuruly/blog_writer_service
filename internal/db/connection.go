@@ -7,10 +7,12 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func Connect(ctx context.Context, dsn string ) (*pgx.Conn, error) {
+func Connect(ctx context.Context, dsn string) (*pgx.Conn, error) {
     conn, err := pgx.Connect(ctx, dsn)
     if err != nil {
         log.Fatalf("Unable to connect to database: %v\n", err)
+		log.Println("Please check your connection string and ensure the database is running.")
+		return nil, err
     }
 
 	log.Println("Connected to the database successfully")
