@@ -17,16 +17,21 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, continuing")
+	if os.Getenv("DOCKER_ENV") == "" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("No .env file found, continuing")
+		}
 	}
 
 	ctx := context.Background()
 
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		log.Fatal("NEON_DATABASE_URL environment variable is not set")
-		log.Println("Please set the NEON_DATABASE_URL environment variable to your database connection string.")
+		dsn = os.Getenv("NEON_DATABASE_URL")
+	}
+	if dsn == "" {
+		log.Fatal("DATABASE_URL or NEON_DATABASE_URL environment variable is not set")
+		log.Println("Please set the DATABASE_URL or NEON_DATABASE_URL environment variable to your database connection string.")
 		return
 	}
 
@@ -42,6 +47,9 @@ func main() {
 
 	client := &http.Client{Timeout: 40 * time.Second}
 	go func() {
+		// Wait for server to be ready before starting scheduled tasks
+		time.Sleep(5 * time.Second)
+
 		for {
 			// Try up to 10 times, with 1 minute between attempts
 			for i := 0; i < 10; i++ {

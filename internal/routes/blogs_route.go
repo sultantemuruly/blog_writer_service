@@ -41,7 +41,5 @@ func postBlog(db *pgx.Conn) http.HandlerFunc {
 		log.Println("Blog inserted successfully without status")
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte("Blog created successfully without status"))
-
-		return
 	}
 }
